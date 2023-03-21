@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriber-deployment
+spec:
+  selector:
+    matchLabels:
+      app: subscriber
+  template:
+    metadata:
+      labels:
+        app: subscriber
+    spec:
+      containers:
+      - name: subscriber
+        image: <subscriber image>
+        imagePullPolicy: Always
+        env:
+          - name: projectID
+            value: "your project"
+          - name: testDuration
+            value: "120m"
+          - name: subscriptionID
+            value: "your subscription"
+          - name: burnInDuration
+            value: "1m"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "2"
+          limits:
+            memory: "256Mi"
+            cpu: "2"
+        ports:
+        - containerPort: 8080
+          name: app
+---
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: subscriber
+  labels:
+    app.kubernetes.io/name: subscriber
+spec:
+  selector:
+    matchLabels:
+      app: subscriber
+  endpoints:
+  - port: app
+    path: "/metrics"
+    interval: 10s

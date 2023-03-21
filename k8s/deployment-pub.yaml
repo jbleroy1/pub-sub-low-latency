@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publisher-deployment
+spec:
+
+  selector:
+    matchLabels:
+      app: publisher
+  template:
+    metadata:
+      labels:
+        app: publisher
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: publisher
+        image: <publisher image>
+        env:
+          - name: projectID
+            value: "your project ID"
+          - name: topicPrefix
+            value: "your topic"
+          - name: duration
+            value: "120m"
+          - name: messageSize
+            value: "1000"
+          - name: RPS
+            value: "1000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "2"
+          limits:
+            memory: "256Mi"
+            cpu: "2"
+        ports:
+        - containerPort: 8080

@@ -1,0 +1,18 @@
+## Build
+FROM golang:1.20-buster AS build
+
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+COPY . .
+
+WORKDIR cmd/pubsub/subscriber/
+ENV CGO_ENABLED=0
+RUN go build  -a -installsuffix cgo -o subscriber .
+## Deploy
+FROM alpine
+COPY --from=build /app/cmd/pubsub/subscriber/ ./
+EXPOSE 8080
+ENTRYPOINT ["./subscriber"]
